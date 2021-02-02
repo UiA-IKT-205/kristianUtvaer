@@ -12,4 +12,8 @@
     <string name="start2text">60min</string>
     <string name="start1ButtonText">30min</string>
     <string name="Start">Start</string>
+    <string name="time_slider">Time Slider</string>
+    <string name="pause_slider">Pause Slider</string>
+    <string name="antall_repetitions">Antall repetitions</string>
+    <string name="defrep">0</string>
 </resources>
