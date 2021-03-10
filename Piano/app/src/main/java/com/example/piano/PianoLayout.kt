@@ -1,11 +1,13 @@
 package com.example.piano
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.net.toUri
 import com.example.piano.data.Note
 import com.example.piano.databinding.FragmentPianoBinding
 import kotlinx.android.synthetic.main.fragment_piano.view.*
@@ -13,6 +15,8 @@ import java.io.File
 import java.io.FileOutputStream
 
 class PianoLayout : Fragment() {
+
+    var onSave:((file:Uri) -> Unit)? = null
 
     private var _binding: FragmentPianoBinding? = null
     private val binding get() = _binding!!
@@ -75,7 +79,7 @@ class PianoLayout : Fragment() {
                 var fullTonerTid: Long = 0
                 fullTonerTid = endPlay - startPlay
                 fullTonerTotTid = fullTonerTid.toDouble() / 1000000000
-
+                
                 val note = Note(it, startPlay, fullTonerTotTid)
                 noteListe.add(note)
                 println("Piano knapp op $note")
@@ -101,11 +105,13 @@ class PianoLayout : Fragment() {
 
                 else -> {
                     fileNavn = "$fileNavn.txt"
-                    FileOutputStream(nyNoteFil, true).bufferedWriter().use { writer ->
+                    val file = File(path,fileNavn)
+                    FileOutputStream(file, true).bufferedWriter().use { writer ->
                         noteListe.forEach {
                             writer.write("${it.toString()}\n")
                         }
-                        FileOutputStream(nyNoteFil).close()
+                        this.onSave?.invoke(file.toUri());
+                        FileOutputStream(file).close()
                     }
 
                     Toast.makeText(activity, "Fil lagret", Toast.LENGTH_SHORT).show()
@@ -122,6 +128,4 @@ class PianoLayout : Fragment() {
 
         return view
     }
-
-
 }
