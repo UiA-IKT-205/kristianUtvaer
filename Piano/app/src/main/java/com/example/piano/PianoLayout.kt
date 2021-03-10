@@ -21,6 +21,8 @@ class PianoLayout : Fragment() {
 
     private val halvNoter = listOf("C#","D#","E#","F#","G#","A#","B#")
     private var noteListe:MutableList<Note> = mutableListOf<Note>()
+    private var startPlay:Long = 0
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +40,7 @@ class PianoLayout : Fragment() {
 
         fullNoter.forEach {
             val fullNoterPianoKey = FullNoterPianoKeyFrag.newInstance(it)
-            var startPlay:Long = 0
+
 
             fullNoterPianoKey.onKeyDown = { note ->
                 startPlay = System.nanoTime()
@@ -64,10 +66,19 @@ class PianoLayout : Fragment() {
             val halvNoterPianoKey = HalvNoterPianoKeyFrag.newInstance(it)
 
             halvNoterPianoKey.onKeyDown = {
+                startPlay = System.nanoTime()
                 println("Piano knapp er nede $it")
             }
             halvNoterPianoKey.onKeyUp = {
-                println("Piano knapp op $it")
+                var endPlay = System.nanoTime()
+                var fullTonerTotTid: Double = 0.0
+                var fullTonerTid: Long = 0
+                fullTonerTid = endPlay - startPlay
+                fullTonerTotTid = fullTonerTid.toDouble() / 1000000000
+
+                val note = Note(it, startPlay, fullTonerTotTid)
+                noteListe.add(note)
+                println("Piano knapp op $note")
             }
 
             ft.add(view.halvNoteKeyLayout.id, halvNoterPianoKey, "note_$it")
@@ -82,10 +93,10 @@ class PianoLayout : Fragment() {
             val nyNoteFil = (File(path, fileNavn))
 
             when {
-                noteListe.count() == 0 -> Toast.makeText(activity, "Forgot notes? Did you click by mistake?", Toast.LENGTH_SHORT).show()
-                fileNavn.isEmpty() -> Toast.makeText(activity, "Forgot filename?", Toast.LENGTH_SHORT).show()
-                path == null -> Toast.makeText(activity, "Are you sure this is the right path?", Toast.LENGTH_SHORT).show()
-                nyNoteFil.exists() -> Toast.makeText(activity, "You already did this one!", Toast.LENGTH_SHORT).show()
+                noteListe.count() == 0 -> Toast.makeText(activity, "Noter ", Toast.LENGTH_SHORT).show()
+                fileNavn.isEmpty() -> Toast.makeText(activity, "Skriv in et filnavn", Toast.LENGTH_SHORT).show()
+                path == null -> Toast.makeText(activity, "Error path", Toast.LENGTH_SHORT).show()
+                nyNoteFil.exists() -> Toast.makeText(activity, "Denne filen eksisterer", Toast.LENGTH_SHORT).show()
 
 
                 else -> {
@@ -97,7 +108,7 @@ class PianoLayout : Fragment() {
                         FileOutputStream(nyNoteFil).close()
                     }
 
-                    Toast.makeText(activity, "Great job, Beethoven! Your file was successful.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity, "Fil lagret", Toast.LENGTH_SHORT).show()
                     noteListe.clear()
 
 
